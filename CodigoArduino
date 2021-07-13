@@ -1,0 +1,155 @@
+#include <stdio.h>
+#include  "DHT.h" //Librería para el sensor DHT11
+#include "LedControl.h" //Libreria para la matriz 8x8
+
+#define SensorInc 4 //Se establecen los pines 
+#define trigUlt 3 
+#define echoUlt 2
+#define DHTTYPE DHT11
+
+long distancia;                
+long duracion;
+long umbraltemp,umbralhum,alertadist,inclinacion;
+
+byte uno[8]= { //1
+  B00010000,        
+  B00110000,
+  B00010000,
+  B00010000,
+  B00010000,
+  B00010000,
+  B00010000,
+  B00111000
+};
+byte dos[8]= {  //2    
+  B00111000,       
+  B01000100,
+  B00000100,
+  B00000100,
+  B00001000,
+  B00010000,
+  B00100000,
+  B01111100
+};
+byte tres[8]= {     //3   
+  B00111000,        
+  B01000100,
+  B00000100,
+  B00011000,
+  B00000100,
+  B00000100,
+  B01000100,
+  B00111000
+};
+byte cuatro[8]= {    //4
+  B00001000,        
+  B00011000,
+  B00101000,
+  B01001000,
+  B01001000,
+  B01111100,
+  B00001000,
+  B00001000
+};
+
+LedControl lc=LedControl(11,13,10,1); //Objeto led con sus pines
+DHT dht(5, DHTTYPE); //Objeto DHT con su pin
+
+void setup() 
+{
+  lc.shutdown(0,false); //Se pone la matriz 8x8 como encendida
+  lc.setIntensity(0,6); //Se pone la intensidad de los leds a 6 
+  lc.clearDisplay(0);   //Se limpia la matriz en el encendido para que no se enciendan luces al inicio.
+  
+  Serial.begin(9600);          
+  pinMode(trigUlt, OUTPUT);
+  pinMode (SensorInc,INPUT);
+  pinMode(echoUlt, INPUT);
+  dht.begin();
+  while(!Serial) { ; }
+}
+
+void loop() {   
+    float h,t,f;
+     int letras = Serial.available();    
+     char palabra[letras];
+     int x,i;
+      if( Serial.available()> 0) 
+      {
+          for(x=0; x<letras; x++)
+          palabra[x]= Serial.read();
+          for(i=0; i<letras; i++) 
+          palabra[i] -= 32;
+      }
+        if ( palabra=="dist") //Si el mensaje es que se ha activado distancia
+    {
+       distancia = readUltrasonicSensor();
+        if (distancia<=alertadist)
+        Serial.println("Alerta por distancia"); 
+        mostrar_1();
+    }        
+    if ( palabra=="temp") //Si el mensaje es que se ha activado temperatura
+    {
+      t=dht.readTemperature();
+      if (t>=umbraltemp)
+      {
+        Serial.println("Alerta por temperatura");
+        mostrar_3();
+      }
+    }              
+    if (palabra =="hume") //Si el mensaje es que se ha activado humedad
+    {
+      h=dht.readHumidity();
+      if (h>=umbralhum)
+      {
+        Serial.println("Alerta por humedad");
+        mostrar_2();
+      }
+    }
+    if (palabra =="incl") //Si el mensaje es que se ha activado inclinacion
+    {
+      
+      if (digitalRead(SensorInc)==inclinacion)
+      {
+         Serial.println("Alerta por inclinacion");
+         mostrar_3();
+      }
+    }
+    delay(250);  //Delay de 250 milisegundos   
+}
+
+long readUltrasonicSensor() {
+    digitalWrite(trigUlt, HIGH);                    
+    delayMicroseconds(10);
+    digitalWrite(trigUlt, LOW);        
+    
+    duracion = pulseIn(echoUlt, HIGH); 
+    return (duracion / 58);        
+}
+void mostrar_1(){    //Funcion para mostrar el numero 1 (Distancia)
+  for (int i = 0; i < 8; i++) 
+  {
+    lc.setRow(0,i,uno[i]);  
+  }
+}
+
+void mostrar_2(){  //Funcion para mostrar el numero 2(Temperatura)
+  for (int i = 0; i < 8; i++)    
+  {
+    lc.setRow(0,i,dos[i]);
+  }
+}
+
+void mostrar_3(){     //Funcion para mostrar el numero 3(Humedad)
+  for (int i = 0; i < 8; i++)    
+  {
+    lc.setRow(0,i,tres[i]);   
+  }
+}
+
+void mostrar_4(){   //Funcion para mostrar el numero 4(Inclinacion)
+  for (int i = 0; i < 8; i++)   
+  {
+    lc.setRow(0,i,cuatro[i]);
+  }
+}
