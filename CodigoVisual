@@ -1,0 +1,224 @@
+#include <stdio.h>
+#include "SerialClass.h"
+
+void alta(FILE*,FILE*,FILE*,FILE*);
+void eliminar(FILE*, FILE*, FILE*, FILE*);
+void disponibles(FILE*, FILE*, FILE*, FILE*);
+void activo(FILE*, FILE*, FILE*, FILE*);
+int main()
+{
+	Serial* Arduino = new Serial("COM3");
+	int res, programa = 1;
+	FILE* pd, * pr, * pf, * pfs;
+	errno_t err, err1, err2, err3;
+	err = fopen_s(&pd, "distancia.txt", "r");
+	err1 = fopen_s(&pr, "temperatura.txt", "r");
+	err2 = fopen_s(&pf, "humedad.txt", "r");
+	err3 = fopen_s(&pfs, "inclinacion.txt", "r");
+	do
+	{
+		printf("Trabajo de informatica: \n");
+		do {
+			printf("\t1. Dar de alta una alarma.\n");
+			printf("\t2. Eliminar una alarma.\n");
+			printf("\t3. Listar alarmas disponibles.\n");
+			printf("\t4. Activar/Desactivar alarma.\n");	
+			scanf_s("%d", &res);
+		} while (res < 1 && res > 4);
+		switch (res)
+		{
+		case 1:
+			alta(pd,pr,pf,pfs);
+			break;
+		case 2:
+			eliminar(pd, pr, pf, pfs);
+			break;
+		case 3:
+			disponibles(pd, pr, pf, pfs);
+			break;
+		case 4:
+			activo(pd, pr, pf, pfs);
+			break;
+		}
+	} while (programa != 0);
+}
+
+
+void alta(FILE* pd, FILE* pr, FILE* pf, FILE* pfs)
+{
+	int umbraltemp, umbralhum, inclinacion, distancia;
+	int respuesta;
+	printf(" ");
+	printf("\t1. Alarma de distancia.\n");
+	printf("\t2. Alarma de temperatura.\n");
+	printf("\t3. Alarma de humedad.\n");
+	printf("\t4. Alarma de inclinacion.\n"); printf(" ");
+
+	do
+	{
+		printf("Que alarma quieres dar de alta?\n");
+		scanf_s("%d", &respuesta);
+	} while (respuesta < 1 && respuesta > 4);
+	if (respuesta == 1)
+	{
+		do {
+			printf("\nIntroduce la distancia de activación(De 3 a 400): ");
+			scanf_s("%d", &distancia);
+		} while (distancia < 3 || distancia>400);
+		fopen_s(&pd, "distancia.txt", "w+");
+		fprintf(pd, "%d 1", distancia);
+	}
+	if (respuesta == 2)
+	{
+		do {
+			printf("\nIntroduce el umbral de temperatura(De 0 a 50): ");
+			scanf_s("%d", &umbraltemp);
+		} while (umbraltemp < 0 && umbraltemp>50);
+		fopen_s(&pr, "temperatura.txt", "w+");
+		fprintf(pr, "%d 1", umbraltemp);
+	}
+	if (respuesta == 3)
+	{
+		do
+		{
+			printf("\nIntroduce el umbral de humedad(De 20 por ciento a 90 por ciento): ");
+			scanf_s("%d", &umbralhum);
+		} while (umbralhum < 20 && umbralhum>90);
+		fopen_s(&pf, "humedad.txt", "w+");
+		fprintf(pf, "%d 1", umbralhum);
+	}
+	if (respuesta == 4)
+	{
+		do {
+			printf("\nIntroduce el estado de activación(1=Encendido,0=Apagado): ");
+			scanf_s("%d", &inclinacion);
+		} while (inclinacion != 0 && inclinacion != 1);
+		fopen_s(&pfs, "inclinacion.txt", "w+");
+		fprintf(pfs, "%d 1", inclinacion);
+	}
+}
+void eliminar(FILE* pd, FILE* pr, FILE* pf, FILE* pfs)
+{
+	char respuesta2;
+	printf(" ");
+	printf("\td. Alarma de distancia.\n");
+	printf("\tt. Alarma de temperatura.\n");
+	printf("\th. Alarma de humedad.\n");
+	printf("\ti. Alarma de inclinacion.\n"); printf(" ");
+	do
+	{
+		printf("Que alarma quieres eliminar?\n");
+		scanf_s("%c", &respuesta2,1);
+	} while (respuesta2 != 'd' && respuesta2 != 't' && respuesta2 != 'h' && respuesta2 != 'i');
+	if (respuesta2 == 'd')
+	{
+		fopen_s(&pd, "distancia.txt", "w+"); //w+ abre un fichero para escribir y leer. Si el fichero ya existe, lo borra.
+	}
+	if (respuesta2 == 't')
+	{
+		fopen_s(&pr, "temperatura.txt", "w+");
+	}
+	if (respuesta2 == 'h')
+	{
+		fopen_s(&pf, "humedad.txt", "w+");
+	}
+	if (respuesta2 == 'i')
+	{
+		fopen_s(&pfs, "inclinacion	.txt", "w+");
+	}
+}
+void disponibles(FILE* pd, FILE* pr, FILE* pf, FILE* pfs)
+{
+	int disponible1, disponible2, disponible3, disponible4;
+	int distancia, umbralhum, umbraltemp, inclinacion;
+	while (feof(pd) == NULL)
+	{
+		fscanf_s(pd, "%d %d", &distancia, &disponible1);
+		if (disponible1 == 1 || disponible1 == 0)
+			printf("El sensor de distancia está disponible");
+			
+	}
+	while (feof(pr) == NULL)
+	{
+		fscanf_s(pr, "%d %d", &umbraltemp, &disponible2);
+		if (disponible2 == 1 || disponible2 == 0)
+			printf("El sensor de distancia está disponible");
+	}
+	while (feof(pf) == NULL)
+	{
+		fscanf_s(pf, "%d %d", &umbralhum, &disponible3);
+		if (disponible3 == 1 || disponible3 == 0)
+			printf("El sensor de distancia está disponible");
+	}
+	while (feof(pfs) == NULL)
+	{	
+		fscanf_s(pfs, "%d %d", &inclinacion, &disponible4);
+		if (disponible4 == 1 || disponible4 == 0)
+			printf("El sensor de distancia está disponible");
+	}
+}
+void activo(FILE* pd, FILE* pr, FILE* pf, FILE* pfs)
+{
+	Serial* Arduino = new Serial("COM3");
+	int activacion, alarma;
+	int distancia,umbralhum, umbraltemp, inclinacion;
+	int activo1, activo2, activo3, activo4;
+	fscanf_s(pd, "%d %d", &distancia, &activo1);
+	fscanf_s(pr, "%d %d", &umbralhum, &activo2);
+	fscanf_s(pf, "%d %d", &umbraltemp, &activo3);
+	fscanf_s(pfs, "%d %d", &inclinacion, &activo4);
+	printf(" ");
+	printf("\td. Alarma de distancia.\n");
+	printf("\tt. Alarma de temperatura.\n");
+	printf("\th. Alarma de humedad.\n");
+	printf("\ti. Alarma de inclinacion.\n"); printf(" ");
+	do {
+		printf("Que alarma desea activar o desactivar: ");
+		scanf_s("%d", &alarma);
+	} while (alarma < 1 && alarma>4);
+	do {
+		printf("\n Desea activarla(1) o desactivarla(0)?: ");
+		scanf_s("%d", &activacion);
+	} while (activacion != 0 && activacion != 1);
+	if (alarma == 1)
+	{
+		fopen_s(&pd, "distancia.txt", "w+");
+		fprintf(pd, "%d %d", distancia, activacion);
+		if (activacion == 1) //Si se activa la alarma, se envía el mensaje a Arduino.
+		{
+			char palabra[] = "dist";
+			Arduino->WriteData(palabra, 5);
+		}
+
+	}
+	if (alarma == 2)
+	{
+		fopen_s(&pr, "temperatura.txt", "w+");
+		fprintf(pr, "%d %d", umbraltemp, activacion);
+		if (activacion == 1)
+		{
+			char palabra[] = "temp";
+			Arduino->WriteData(palabra, 5);
+		}
+	}
+	if (alarma == 3)
+	{
+		fopen_s(&pf, "humedad.txt", "w+");
+		fprintf(pf, "%d %d", umbralhum, activacion);
+		if (activacion == 1)
+		{
+			char palabra[] = "hume";
+			Arduino->WriteData(palabra, 5);
+		}
+	}
+	if (alarma == 4)
+	{
+		fopen_s(&pfs, "inclinacion.txt", "w+");
+		fprintf(pfs, "%d %d", inclinacion, activacion);
+		if (activacion == 1)
+		{
+			char palabra[] = "incl";
+			Arduino->WriteData(palabra, 5);
+		}
+	}
+}
