@@ -1,11 +1,11 @@
-# [Título del trabajo]
+# [Sistema de alarmas]
 
-[Descripción breve del proyecto a realizar (2-3 frases).]
+[El programa consiste en un sistema de alarmas. Se imprimirá en la pantalla y en una matriz led 8x8 cuando se active una de las 4 alarmas.]
 
 ## Integrantes del equipo
 
-[Nombres, apellidos, y usuario GitHub de los integrantes del equipo.]
+[Joaquín Gabriel Huirse Liendo. Usuario: jhuirse ]
 
 ## Objetivos del trabajo
 
-[Lista de los objetivos que se persiguen con el trabajo propuesto.]
+[Montaje del circuito,programación de un sistema de funciones para dar alarmas de alta, activar y desactivar alarmas, eliminar alarmas y comprobar las alarmas existentes.]
