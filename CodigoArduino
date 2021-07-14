@@ -85,8 +85,10 @@ void loop() {
     {
        distancia = readUltrasonicSensor();
         if (distancia<=alertadist)
+        {
         Serial.println("Alerta por distancia"); 
         mostrar_1();
+        }
     }        
     if ( palabra=="temp") //Si el mensaje es que se ha activado temperatura
     {
