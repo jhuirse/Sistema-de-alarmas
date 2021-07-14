@@ -121,10 +121,10 @@ void loop() {
 }
 
 long readUltrasonicSensor() {
+    long duracion; 
     digitalWrite(trigUlt, HIGH);                    
     delayMicroseconds(10);
     digitalWrite(trigUlt, LOW);        
-    
     duracion = pulseIn(echoUlt, HIGH); 
     return (duracion / 58);        
 }
